@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>User Management Dashboard</h1>
+    <form id="createUserForm">
+        <h2>Create User</h2>
+        <label for="createUsername">Username:</label>
+        <input type="text" id="createUsername" name="username" required>
+        <label for="createPassword">Password:</label>
+        <input type="password" id="createPassword" name="password" required>
+        <label for="createDescription">Description:</label>
+        <input type="text" id="createDescription" name="description">
+        <button type="submit">Create</button>
+    </form>
+
+    <hr>
+
+    <form id="getUserForm">
+        <h2>Get User</h2>
+        <label for="getUserId">User ID:</label>
+        <input type="number" id="getUserId" name="id" required>
+        <button type="submit">Get</button>
+        <div id="getUserResult"></div>
+    </form>
+
+    <hr>
+
+    <form id="updateUserForm">
+        <h2>Update User</h2>
+        <label for="updateUserId">User ID:</label>
+        <input type="number" id="updateUserId" name="id" required>
+        <label for="updateDescription">New Description:</label>
+        <input type="text" id="updateDescription" name="description">
+        <label for="updatePassword">New Password:</label>
+        <input type="password" id="updatePassword" name="password">
+        <button type="submit">Update</button>
+    </form>
+
+    <hr>
+
+    <form id="deleteUserForm">
+        <h2>Delete User</h2>
+        <label for="deleteUserId">User ID:</label>
+        <input type="number" id="deleteUserId" name="id" required>
+        <button type="submit">Delete</button>
+    </form>
+
+    <script>
+        document.getElementById('createUserForm').onsubmit = async (event) => {
+            event.preventDefault();
+            const data = {
+                username: event.target.username.value,
+                password: event.target.password.value,
+                description: event.target.description.value
+            };
+            const response = await fetch('/users/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            alert(response.ok ? "User created!" : "Error creating user");
+        };
+
+        document.getElementById('getUserForm').onsubmit = async (event) => {
+            event.preventDefault();
+            const id = event.target.id.value;
+            const response = await fetch(`/users/${id}`);
+            const user = await response.json();
+            document.getElementById('getUserResult').innerText = response.ok
+                ? JSON.stringify(user, null, 2)
+                : "User not found";
+        };
+
+        document.getElementById('updateUserForm').onsubmit = async (event) => {
+            event.preventDefault();
+            const id = event.target.id.value;
+            const data = {
+                description: event.target.description.value,
+                password: event.target.password.value
+            };
+            const response = await fetch(`/users/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            alert(response.ok ? "User updated!" : "Error updating user");
+        };
+
+        document.getElementById('deleteUserForm').onsubmit = async (event) => {
+            event.preventDefault();
+            const id = event.target.id.value;
+            const response = await fetch(`/users/${id}`, { method: 'DELETE' });
+            alert(response.ok ? "User deleted!" : "Error deleting user");
+        };
+    </script>
+</body>
+</html>
